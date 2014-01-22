@@ -3,6 +3,7 @@
 Michelangelo is a tiny android library to quickly inject a layout in your compound view.
 This library is still at an early stage.
 
+## How to use
 An example of use:
 
 ```java
@@ -42,6 +43,7 @@ MyCustomView view = Michelangelo.inflate(this, MyCustomView.class, new OnViewCha
 });
 ```
 
+## License
 ```
 Copyright 2014 Romain Piel
 
