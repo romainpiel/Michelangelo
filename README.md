@@ -5,7 +5,7 @@ This library is still at an early stage.
 
 An example of use:
 
-```
+```java
 @InflateLayout(R.layout.custom_view)
 public class MyCustomView extends FrameLayout {
 
@@ -21,7 +21,7 @@ public class MyCustomView extends FrameLayout {
 ```
 
 `R.layout.custom_view`:
-```
+```xml
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
@@ -33,7 +33,7 @@ public class MyCustomView extends FrameLayout {
 ```
 
 Inflating that View is pretty straightforward:
-```
+```java
 MyCustomView view = Michelangelo.inflate(this, MyCustomView.class, new OnViewChangedListener<MyCustomView>() {
     @Override
     public void onViewChanged(MyCustomView view) {
