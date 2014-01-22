@@ -63,7 +63,7 @@ Then call this method to inflate the layout + inject the views:
 Michelangelo.inflateAndInject(this, MyCustomView.class);
 ```
 
-Then the injected views are ready to be used!
+Then the injected views are ready to be used! See the [example](https://github.com/RomainPiel/Michelangelo/blob/master/michelangelo-sample/src/main/java/com/romainpiel/michelangelo/sample/MainActivity.java).
 
 ## License
 ```
