@@ -43,6 +43,28 @@ MyCustomView view = Michelangelo.inflate(this, MyCustomView.class, new OnViewCha
 });
 ```
 
+## Annotations description
+
+Use the annotation `@InflateLayout` on your `ViewGroup` and specify the layout to inflate. You'd better use a `<merge>` root on your layout for better performances.
+
+Use the annotation `@AfterInflate` on your compound view's methods you want to run straight after the layout is inflated with Michelangelo.
+
+## Michelangelo and ButterKnife
+
+Michelangelo plays very well with Jake Wharton's library [ButterKnife](https://github.com/JakeWharton/butterknife).
+After adding the library to your project, just add your injections to your compound views as usual:
+
+```java
+@InjectView(R.id.my_text_view) TextView myTextView;
+```
+
+Then call this method to inflate the layout + inject the views:
+```java
+Michelangelo.inflateAndInject(this, MyCustomView.class);
+```
+
+Then the injected views are ready to be used!
+
 ## License
 ```
 Copyright 2014 Romain Piel

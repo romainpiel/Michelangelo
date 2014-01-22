@@ -20,4 +20,5 @@ android {
 
 dependencies {
     compile project(':michelangelo')
+    compile 'com.jakewharton:butterknife:4.0.1'
 }

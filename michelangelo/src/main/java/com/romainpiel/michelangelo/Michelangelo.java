@@ -57,6 +57,35 @@ public class Michelangelo {
         return view;
     }
 
+    public static <T extends ViewGroup> T inflate(Context context, Class<T> clazz) {
+        return inflate(context, clazz, null);
+    }
+
+    public static <T extends ViewGroup> T inflateAndInject(Context context, Class<T> clazz) {
+        final Class<?> butterknife;
+        try {
+            butterknife = Class.forName("butterknife.ButterKnife");
+            return inflate(context, clazz, new OnViewChangedListener<T>() {
+                @Override
+                public void onViewChanged(T view) {
+                    try {
+                        butterknife.getMethod("inject", View.class).invoke(null, view);
+                    } catch (IllegalAccessException e) {
+                        Log.e(TAG, e.getMessage());
+                    } catch (InvocationTargetException e) {
+                        Log.e(TAG, e.getMessage());
+                    } catch (NoSuchMethodException e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                }
+            });
+        } catch (ClassNotFoundException e) {
+            Log.e(TAG, "library ButterKnife not found");
+        }
+
+        return null;
+    }
+
     public static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
         final List<Method> methods = new ArrayList<Method>();
         Class<?> clazz = type;
