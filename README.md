@@ -71,6 +71,7 @@ public class PaintingItemView extends LinearLayout {
 ## Order of events
 
 When you call `Michelangelo.build()`:
+
 1. The view gets inflated
 2. If specified, the injector is applied (`ButterKnife.inject(view)`)
 3. If exist, methods annotated with `@AfterInflate` are run.
