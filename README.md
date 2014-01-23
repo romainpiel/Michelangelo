@@ -1,9 +1,9 @@
 # Michelangelo
 
-Michelangelo is a tiny android library to quickly inject a layout in your compound view.
-This library is still at an early stage.
+Layout inflation library for Android which uses annotation processing to write the code you don't want to write and simplify your compound views.
 
 ## How to use
+
 An example of use:
 
 ```java
@@ -15,8 +15,8 @@ public class MyCustomView extends FrameLayout {
     }
 
     @AfterInflate
-    public void showToast() {
-        Toast.makeText(getContext(), "view inflated!", Toast.LENGTH_SHORT).show();
+    public void updateTextView() {
+        ((TextView) findViewById(R.id.my_text_view)).setText("hey!");
     }
 }
 ```
@@ -35,35 +35,49 @@ public class MyCustomView extends FrameLayout {
 
 Inflating that View is pretty straightforward:
 ```java
-MyCustomView view = Michelangelo.inflate(this, MyCustomView.class, new OnViewChangedListener<MyCustomView>() {
-    @Override
-    public void onViewChanged(MyCustomView view) {
-        ((TextView) view.findViewById(R.id.my_text_view)).setText("hey!");
-    }
-});
+MyCustomView view = Michelangelo.build(this, MyCustomView.class);
 ```
 
-## Annotations description
-
-Use the annotation `@InflateLayout` on your `ViewGroup` and specify the layout to inflate. You'd better use a `<merge>` root on your layout for better performances.
+## Post inflate methods
 
 Use the annotation `@AfterInflate` on your compound view's methods you want to run straight after the layout is inflated with Michelangelo.
 
 ## Michelangelo and ButterKnife
 
-Michelangelo plays very well with Jake Wharton's library [ButterKnife](https://github.com/JakeWharton/butterknife).
-After adding the library to your project, just add your injections to your compound views as usual:
+Michelangelo plays very well with Jake Wharton's library [ButterKnife](https://github.com/JakeWharton/butterknife). Just add the annotation `@InjectViews` to your `ViewGroup` and Michelangelo will do the rest.
+
+Example using ButterKnife:
 
 ```java
-@InjectView(R.id.my_text_view) TextView myTextView;
+@InflateLayout(R.layout.item_painting)
+@InjectViews
+public class PaintingItemView extends LinearLayout {
+
+    @InjectView(R.id.image) ImageView image;
+    @InjectView(R.id.title) TextView title;
+
+    public PaintingItemView(Context context) {
+        super(context);
+        setOrientation(HORIZONTAL);
+    }
+
+    public void bind(Painting painting) {
+        image.setImageResource(painting.getDrawableResId());
+        title.setText(painting.getTitle());
+    }
+}
 ```
 
-Then call this method to inflate the layout + inject the views:
-```java
-Michelangelo.inflateAndInject(this, MyCustomView.class);
-```
+## Order of events
 
-Then the injected views are ready to be used! See the [example](https://github.com/RomainPiel/Michelangelo/blob/master/michelangelo-sample/src/main/java/com/romainpiel/michelangelo/sample/MainActivity.java).
+When you call `Michelangelo.build()`:
+1. The view gets inflated
+2. If specified, the injector is applied (`ButterKnife.inject(view)`)
+3. If exist, methods annotated with `@AfterInflate` are run.
+
+## Sample
+
+See the [sample](https://github.com/RomainPiel/Michelangelo/tree/master/michelangelo-sample/src/main) for a common use of this library with `ListView` adapters.
 
 ## License
 ```

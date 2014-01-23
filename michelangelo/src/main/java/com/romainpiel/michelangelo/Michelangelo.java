@@ -21,7 +21,7 @@ public class Michelangelo {
 
     private static final String TAG = "MICHELANGELO";
 
-    public static <T extends ViewGroup> T inflate(Context context, Class<T> clazz, OnViewChangedListener<T> listener) {
+    public static <T extends ViewGroup> T build(Context context, Class<T> clazz) {
         T view = null;
 
         InflateLayout inflateLayout = clazz.getAnnotation(InflateLayout.class);
@@ -34,8 +34,15 @@ public class Michelangelo {
                 view = clazz.getConstructor(Context.class).newInstance(context);
                 View.inflate(context, layoutResId, view);
 
-                if (listener != null) {
-                    listener.onViewChanged(view);
+                InjectViews injectViews = clazz.getAnnotation(InjectViews.class);
+                if (injectViews != null) {
+
+                    Injector injector = injectViews.value();
+                    switch (injector) {
+                        case BUTTERKNIFE:
+                            injectButterKnife(view);
+                            break;
+                    }
                 }
 
                 List<Method> afterInflateMethods = getMethodsAnnotatedWith(clazz, AfterInflate.class);
@@ -57,49 +64,33 @@ public class Michelangelo {
         return view;
     }
 
-    public static <T extends ViewGroup> T inflate(Context context, Class<T> clazz) {
-        return inflate(context, clazz, null);
-    }
-
-    public static <T extends ViewGroup> T inflateAndInject(Context context, Class<T> clazz) {
+    private static void injectButterKnife(View view) {
         final Class<?> butterknife;
         try {
             butterknife = Class.forName("butterknife.ButterKnife");
-            return inflate(context, clazz, new OnViewChangedListener<T>() {
-                @Override
-                public void onViewChanged(T view) {
-                    try {
-                        butterknife.getMethod("inject", View.class).invoke(null, view);
-                    } catch (IllegalAccessException e) {
-                        Log.e(TAG, e.getMessage());
-                    } catch (InvocationTargetException e) {
-                        Log.e(TAG, e.getMessage());
-                    } catch (NoSuchMethodException e) {
-                        Log.e(TAG, e.getMessage());
-                    }
-                }
-            });
+            butterknife.getMethod("inject", View.class).invoke(null, view);
+        } catch (IllegalAccessException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (InvocationTargetException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (NoSuchMethodException e) {
+            Log.e(TAG, e.getMessage());
         } catch (ClassNotFoundException e) {
             Log.e(TAG, "library ButterKnife not found");
         }
 
-        return null;
     }
 
     public static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
         final List<Method> methods = new ArrayList<Method>();
-        Class<?> clazz = type;
-        while (clazz != Object.class) {
 
-            final List<Method> allMethods = new ArrayList<Method>(Arrays.asList(clazz.getDeclaredMethods()));
-            for (final Method method : allMethods) {
-                if (annotation == null || method.isAnnotationPresent(annotation)) {
-                    methods.add(method);
-                }
+        final List<Method> allMethods = new ArrayList<Method>(Arrays.asList(type.getDeclaredMethods()));
+        for (final Method method : allMethods) {
+            if (annotation == null || method.isAnnotationPresent(annotation)) {
+                methods.add(method);
             }
-
-            clazz = clazz.getSuperclass();
         }
+
         return methods;
     }
 }
